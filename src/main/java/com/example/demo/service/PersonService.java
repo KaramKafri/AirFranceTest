@@ -15,6 +15,7 @@ import java.util.Objects;
  * Service
  */
 @Service
+@Transactional
 public class PersonService {
     @Autowired
     private PersonRepository repo;
@@ -35,7 +36,6 @@ public class PersonService {
      */
     public void save(Person user)  {
         Objects.requireNonNull(user, "L'objet User ne doit pas être null");
-        olderAndFrench(user);
         repo.save(user);
     }
 

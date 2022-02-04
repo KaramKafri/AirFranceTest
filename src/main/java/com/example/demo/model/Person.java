@@ -76,4 +76,16 @@ public class Person {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+    public Person(Long id,String userName, Date dateOfBirth, String country, String phoneNumber, String gender) {
+       this.id=id;
+        this.userName = userName;
+        this.dateOfBirth = dateOfBirth;
+        this.country = country;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+    }
+
+    public Person() {
+    }
 }
