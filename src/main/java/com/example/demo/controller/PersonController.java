@@ -59,12 +59,12 @@ public class PersonController {
                     "One of three required fields(userName,dateOfBirth,country) is empty",
                     HttpStatus.BAD_REQUEST);
         }
-        else if(personService.existsByUserName(person.getUserName())){
+         if(personService.existsByUserName(person.getUserName())){
             return new ResponseEntity<>(
                     "The name of the User already exists",
                     HttpStatus.FOUND);
         }
-        else if(!personService.olderAndFrench(User)){
+         if(!personService.olderAndFrench(User)){
             return new ResponseEntity<>(
                     "The User must be over 18 years old and reside in France",
                     HttpStatus.NOT_ACCEPTABLE);

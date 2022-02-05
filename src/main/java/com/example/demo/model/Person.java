@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 public class Person {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id", nullable = false)
     private Long id;
 
@@ -77,8 +77,7 @@ public class Person {
         this.gender = gender;
     }
 
-    public Person(Long id,String userName, Date dateOfBirth, String country, String phoneNumber, String gender) {
-       this.id=id;
+    public Person(String userName, Date dateOfBirth, String country, String phoneNumber, String gender) {
         this.userName = userName;
         this.dateOfBirth = dateOfBirth;
         this.country = country;

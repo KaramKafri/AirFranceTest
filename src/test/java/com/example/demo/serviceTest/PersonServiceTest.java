@@ -30,23 +30,30 @@ public class PersonServiceTest {
 
     @Test
     @Transactional
-    public void findByUserNameLikeTest() {
-
+    public void findByUserNameLikeTest() throws ParseException {
+        String sDate1="31/12/1998";
+        Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+        Person person=new Person("newName",date1,"FRANCE","0651460593","M");
+        repository.save(person);
         // when
-        final Person per = service.findByUserNameLike("Karam");
-        assertEquals(per.getId().longValue(), 1L);
+        final Person per = service.findByUserNameLike(person.getUserName());
+        assertEquals(per.getId(), person.getId());
     }
 
     @Test
     @Transactional
-    public void saveTest() {
-        // when
-        final Person per = service.findByUserNameLike("Karam");
-        per.setUserName("Jose");
+    public void saveTest() throws ParseException {
+        String sDate1="31/12/1998";
+        Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+        Person person=new Person("newName",date1,"FRANCE","0651460593","M");
 
-        service.save(per);
-        assertEquals(per.getId().longValue(), 1L);
-        assertEquals(per.getUserName(), "Jose");
+        // when
+        service.save(person);
+        final Person per = repository.findByUserNameLike(person.getUserName());
+
+        //then
+        assertEquals(per.getId(),person.getId());
+        assertEquals(per.getUserName(), person.getUserName());
     }
 
     @Test
@@ -54,26 +61,22 @@ public class PersonServiceTest {
     public void olderAndFrenchTest() throws ParseException {
         String string = "January 2, 2020";
         DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        Date date = format.parse(string);
-        System.out.println(date);
+        Date date1 = format.parse(string);
+        Person person1=new Person("person1",date1,"FRANCE","0651460593","M");
+
+
+        String sDate1="31/12/1998";
+        Date date2=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+        Person person2=new Person("person2",date2,"ITALY","0651460593","M");
+
         // when
-        final Person per = service.findByUserNameLike("Karam");
-        //the user is under 18
-        per.setDateOfBirth(date);
+        repository.save(person1);
+        repository.save(person2);
+        boolean isOld=service.olderAndFrench(person1);
+        boolean isFrance=service.olderAndFrench(person2);
 
-        final Person per2 = service.findByUserNameLike("Antoine");
-        // not reside in France
-        per2.setCountry("Italie");
-
-        service.save(per);
-        service.save(per2);
-        boolean is=service.olderAndFrench(per);
-        boolean is2=service.olderAndFrench(per2);
-        assertEquals(per.getId().longValue(), 1L);
-        assertEquals(per.getUserName(), "Karam");
-        assertEquals(per.getUserName(), "Karam");
-        assertFalse(is);
-        assertFalse(is2);
+        assertFalse(isOld);
+        assertFalse(isFrance);
     }
 
 
@@ -95,10 +98,10 @@ public class PersonServiceTest {
     public void existsByUserNameTest() {
         // when
         final Person per = service.findByUserNameLike("Karam");
-        boolean is=service.existsByUserName(per.getUserName());
+        boolean isexists=service.existsByUserName(per.getUserName());
         assertEquals(per.getId().longValue(), 1L);
         assertEquals(per.getUserName(), "Karam");
-        assertTrue(is);
+        assertTrue(isexists);
     }
 
 
