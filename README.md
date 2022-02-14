@@ -14,8 +14,8 @@ $ cd ../path/to/the/file
 $ mvn clean install
 $ run DemoApplication
 Dans la navigateur :
-http://localhost:8080/newUser + objet User
-http://localhost:8080/getUserByName/{name}
+http://localhost:8080/users + objet User
+http://localhost:8080/users/{name}
 
 ## Comment faire appel aux API REST
 avoir un compte postamn 
@@ -28,10 +28,46 @@ Dans le fichier src/main/resources/data.sql
 
 
 ## Technologies
-Java 8
+Java 11
 maven 3.8.1
-junit
+junit.jupiter
+mockito
 h2
 mapstruct
 
-
+## project architect
+pom.xml
+src
+├───main
+│   ├───java
+│   │   └───com
+│   │       └───demo
+│   │           │   DemoApplication.java
+│   │           ├───controller
+│   │           │       PersonController.java
+│   │           ├───exception
+│   │           │       ControllerAdvisor
+│   │           │       NameNotFoundException
+│   │           │       UserExistException
+│   │           ├───model
+│   │           │      Person.java
+│   │           ├───dao
+│   │           │       PersonRepository.java
+│   │           ├───dto
+│   │           │       PersonDto
+│   │           ├───aspect
+│   │           │       LoggingAspect
+│   │           ├───validator
+│   │           │       AdultValidator
+│   │           │       ContactNumberValidator
+│   │           │       DateOfBirthValidator
+│   │           │       FranceValidator
+│   │           │
+│   │           └───service
+│   │                   PersonService.java
+│   │                   
+│   └───resources
+│           application.properties
+│           data.sql
+└───test
+└───java

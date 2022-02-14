@@ -2,109 +2,100 @@ package com.example.demo.serviceTest;
 
 
 import com.example.demo.dao.PersonRepository;
+import com.example.demo.exception.NameNotFoundException;
+import com.example.demo.exception.UserExistException;
 import com.example.demo.model.Person;
 import com.example.demo.service.PersonService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import javax.transaction.Transactional;
-import java.text.DateFormat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+/**
+ *
+ */
+@ExtendWith(MockitoExtension.class)
 public class PersonServiceTest {
-    @Autowired
-    private PersonService service;
-    @Autowired
+
+
+    @Mock
     private PersonRepository repository;
-
-
-    @Test
-    @Transactional
-    public void findByUserNameLikeTest() throws ParseException {
+    private PersonService service;
+    private Person person;
+    @BeforeEach
+    public void setUp() throws NameNotFoundException, ParseException {
         String sDate1="31/12/1998";
         Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-        Person person=new Person("newName",date1,"FRANCE","0651460593","M");
-        repository.save(person);
-        // when
-        final Person per = service.findByUserNameLike(person.getUserName());
-        assertEquals(per.getId(), person.getId());
+        person=new Person("newName",date1,"FRANCE","0651460593","M");
+        service= new PersonService(repository);
     }
 
+    /**
+     *
+     */
     @Test
-    @Transactional
-    public void saveTest() throws ParseException {
-        String sDate1="31/12/1998";
-        Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-        Person person=new Person("newName",date1,"FRANCE","0651460593","M");
+    public void findByUserNameLikeTest() {
 
-        // when
+        when(repository.findByUserNameLike(any())).thenReturn(java.util.Optional.of(person));
+        Person personSaved =service.findByUserNameLike(person.getUserName());
+        assertEquals(personSaved,person);
+
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void findByUserNameLikeExceptionTest() {
+
+        assertThrows(NameNotFoundException.class, () -> service.findByUserNameLike("newName"));
+
+    }
+
+    /**
+     *
+     * @throws NameNotFoundException in case there no name of the user
+     */
+    @Test
+    public void saveTest() throws  NameNotFoundException {
+
+        when(service.existsByUserName(any())).thenReturn(false);
         service.save(person);
-        final Person per = repository.findByUserNameLike(person.getUserName());
+        assertEquals(person.getUserName(),"newName");
 
-        //then
-        assertEquals(per.getId(),person.getId());
-        assertEquals(per.getUserName(), person.getUserName());
     }
 
+    /**
+     *
+     */
     @Test
-    @Transactional
-    public void olderAndFrenchTest() throws ParseException {
-        String string = "January 2, 2020";
-        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        Date date1 = format.parse(string);
-        Person person1=new Person("person1",date1,"FRANCE","0651460593","M");
-
-
-        String sDate1="31/12/1998";
-        Date date2=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-        Person person2=new Person("person2",date2,"ITALY","0651460593","M");
-
-        // when
-        repository.save(person1);
-        repository.save(person2);
-        boolean isOld=service.olderAndFrench(person1);
-        boolean isFrance=service.olderAndFrench(person2);
-
-        assertFalse(isOld);
-        assertFalse(isFrance);
-    }
-
-
-    @Test
-    @Transactional
-    public void requiredFieldsTest() {
-        // when
-        final Person per = service.findByUserNameLike("Karam");
-        per.setCountry("");
-        repository.save(per);
-        boolean is=service.requiredFields(per);
-        assertEquals(per.getId().longValue(), 1L);
-        assertEquals(per.getUserName(), "Karam");
-        assertTrue(is);
-    }
-
-    @Test
-    @Transactional
     public void existsByUserNameTest() {
-        // when
-        final Person per = service.findByUserNameLike("Karam");
-        boolean isexists=service.existsByUserName(per.getUserName());
-        assertEquals(per.getId().longValue(), 1L);
-        assertEquals(per.getUserName(), "Karam");
-        assertTrue(isexists);
+
+        when(repository.existsByUserName(any())).thenReturn(false);
+        boolean existsByUserName =service.existsByUserName(person.getUserName());
+        assertFalse(existsByUserName);
+
     }
 
+    /**
+     *
+     * @throws UserExistException in case the user already exists
+     */
+    @Test
+    public void existsByUserNameExceptionTest() throws UserExistException {
 
+        assertThrows(UserExistException.class, () ->{  when(repository.existsByUserName(any())).thenReturn(true);
+            service.existsByUserName("newName");} );
+
+
+    }
 
 
 }
